@@ -1,5 +1,6 @@
 require('dotenv').config()
 const mongoose = require('mongoose');
+const passportMongoose = require("passport-local-mongoose");
 
 // this is the ip adress mongoose connects to
 const connectionIP = process.env.DB_STRING;
@@ -15,7 +16,9 @@ const UserSchema = new mongoose.Schema({
   password: String
 });
 
+
 //connects mongoose to your Schema
+UserSchema.plugin(passportMongoose);
 const User = connection.model('User', UserSchema);
 
 module.exports = connection;

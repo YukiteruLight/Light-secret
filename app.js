@@ -3,12 +3,12 @@ require('dotenv').config()
 const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
-const ejs = require ('ejs');
+const ejs = require('ejs');
 const passport = require('passport');
-const passportMongoose = require('passport-local-mongoose');
+// const passportMongoose = require('passport-local-mongoose');
 const connection = require('./mongoose-Setup')
+const MongoStore = require('connect-mongo');
 const routes = require('./routes');
-const MongoStore = require('connect-mongo')(session);
 require('./passport')
 
 const app = express();
@@ -17,19 +17,21 @@ app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 // app.use(express.json());
-app.use(express.urlencoded ({
+app.use(express.urlencoded({
   extended: true
 }));
 
-
 // this takes care of all the mongoose stuff
-const sessionStore = new MongoStore({
-  mongooseConnection: connection,
-  collection: 'sessions'
-});
+// const sessionStore = new MongoStore({
+//   mongooseConnection: connection,
+//   collection: 'sessions'
+// });
+const sessionStore = MongoStore.create({
+  mongoUrl: process.env.DB_STRING
+})
 
 //this is the session for the user, its server side, also has a cookie
-app.use(session ({
+app.use(session({
   secret: process.env.SECRET,
   resave: false,
   saveUninitialized: true,
