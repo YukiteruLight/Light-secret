@@ -5,10 +5,10 @@ const session = require('express-session');
 const mongoose = require('mongoose');
 const ejs = require('ejs');
 const passport = require('passport');
-// const passportMongoose = require('passport-local-mongoose');
+const crypto = require('crypto');
+const routes = require('./routes');
 const connection = require('./mongoose-Setup')
 const MongoStore = require('connect-mongo');
-const routes = require('./routes');
 require('./passport')
 
 const app = express();
@@ -16,16 +16,12 @@ const app = express();
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
-// app.use(express.json());
+app.use(express.json());
 app.use(express.urlencoded({
   extended: true
 }));
 
-// this takes care of all the mongoose stuff
-// const sessionStore = new MongoStore({
-//   mongooseConnection: connection,
-//   collection: 'sessions'
-// });
+//this is the new way to us MongoStore
 const sessionStore = MongoStore.create({
   mongoUrl: process.env.DB_STRING
 })
@@ -48,6 +44,8 @@ app.use((req, res, next) => {
   console.log(req.session, req.user);
   next();
 })
+
+
 
 app.use(routes);
 

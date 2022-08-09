@@ -1,29 +1,37 @@
 //This file handles GET and POST REQUESTS
 const router = require('express').Router();
 const passport = require('passport');
-const passportMongoose = require("passport-local-mongoose");
 const connection = require('../mongoose-setup');
 const User = connection.models.User;
 const genPassword = require('../password-encryption').genPassword;
 const isAuth = require('./auth-logic').isAuth;
+// const googleAuth = require('./auth-logic').googleAuth;
 
 //POST ROUTES
 router.post('/register', (req, res, next) => {
+  const saltHash = genPassword(req.body.password);
+  const salt = saltHash.salt
+  const hash = saltHash.hash;
+
   const newUser = new User({
     username: req.body.username,
-    password: req.body.password
+    hash: hash,
+    salt: salt
   });
-
-  User.plugin(passportMongoose)
-
+  //save needs to be a promise now so you need to add .then
   newUser.save()
     .then((user) => {});
   res.redirect('/login');
 });
 
+router.post('/login', passport.authenticate('local', {
+  failureRedirect: '/',
+  successRedirect: '/secrets'
+}));
+
 // GET ROUTES
 router.get('/', (req, res) => {
-  res.render('home')
+  res.render('home');
 });
 
 router.get('/login', (req, res) => {
@@ -46,6 +54,15 @@ router.get('/logout', (req, res, next) => {
   });
   res.redirect('/');
 });
+
+router.get('/auth/google', passport.authenticate('google', {
+  scope: ['profile']
+}));
+
+router.get('/auth/google/secrets', passport.authenticate('google', {
+  failureRedirect: '/login',
+  successRedirect: '/secrets'
+}));
 
 router.get('/submit', isAuth, (req, res, next) => {
   res.render('submit');
