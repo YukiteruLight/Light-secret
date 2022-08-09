@@ -64,6 +64,13 @@ router.get('/auth/google/secrets', passport.authenticate('google', {
   successRedirect: '/secrets'
 }));
 
+router.get('/auth/facebook', passport.authenticate('facebook'));
+
+router.get('/auth/facebook/secrets', passport.authenticate('facebook', {
+  failureRedirect: '/login',
+  successRedirect: '/secrets'
+}));
+
 router.get('/submit', isAuth, (req, res, next) => {
   res.render('submit');
 });

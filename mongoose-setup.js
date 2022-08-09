@@ -15,7 +15,8 @@ const UserSchema = new mongoose.Schema({
     username: String,
     hash: String,
     salt: String,
-    googleId: String
+    googleId: String,
+    facebookId: String
 });
 
 UserSchema.plugin(findOrCreate)
